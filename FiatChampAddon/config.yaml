@@ -15,12 +15,13 @@ options:
   FiatPw: ""
   FiatPin: ""
   Brand: "Jeep"
+  Region: "America"
   RefreshInterval: 15
   ConvertKmToMiles: false
   Debug: false
-  AutoRefreshBattery: false
-  AutoRefreshLocation: false
-  EnableDangerousCommands: false
+  AutoRefreshBattery: true
+  AutoRefreshLocation: true
+  EnableDangerousCommands: true
   CarUnknownLocation: "unknown"
   StartDelaySeconds: 1
 schema:
