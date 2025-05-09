@@ -34,4 +34,4 @@ else
 fi
 
 cd /build/
-./FiatChamp
+dotnet FiatChamp.dll
