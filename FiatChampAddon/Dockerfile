@@ -1,15 +1,14 @@
-# BUILD IMAGE
 ARG BUILD_FROM
 FROM $BUILD_FROM
 
-RUN apk add icu-libs
-RUN apk add icu
+RUN apk add icu-libs icu dotnet-sdk-7.0
+
+WORKDIR /src
+COPY FiatClient/ .
+
+RUN dotnet publish -c Release -o /build
 
 COPY run.sh /run.sh
-RUN chmod a+x /run.sh
-
-COPY FiatClient/build/ /build/.
-
-LABEL org.opencontainers.image.source https://github.com/wubbl0rz/FiatChamp
+RUN chmod +x /run.sh
 
 CMD [ "/run.sh" ]
