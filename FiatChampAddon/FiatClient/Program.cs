@@ -320,12 +320,12 @@ IEnumerable<HaEntity> CreateInteractiveEntities(IFiatClient fiatClient, SimpleMq
       forceLoopResetEvent.Set();
   });
 
-  var lockSwitch = new HaSwitch(mqttClient, "DoorLock", haDevice, async sw =>
+  var doorLock = new HaLock(mqttClient, "DoorLock", haDevice, async lockEntity =>
   {
-    if (await TrySendCommand(fiatClient, sw.IsOn ? FiatCommand.RDL : FiatCommand.RDU, vehicle.Vin))
+    if (await TrySendCommand(fiatClient, lockEntity.IsLocked ? FiatCommand.RDL : FiatCommand.RDU, vehicle.Vin))
       forceLoopResetEvent.Set();
   });
-
+  
   return new HaEntity[]
   {
     hvacSwitch,
@@ -334,7 +334,7 @@ IEnumerable<HaEntity> CreateInteractiveEntities(IFiatClient fiatClient, SimpleMq
     deepRefreshButton,
     locateLightsButton,
     updateLocationButton,
-    lockSwitch,
+    doorLock,
     batteryRefreshButton
   };
 }
