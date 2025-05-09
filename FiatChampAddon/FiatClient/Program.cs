@@ -313,12 +313,20 @@ IEnumerable<HaEntity> CreateInteractiveEntities(IFiatClient fiatClient, SimpleMq
     if (await TrySendCommand(fiatClient, sw.IsOn ? FiatCommand.ROTRUNKUNLOCK : FiatCommand.ROTRUNKLOCK, vehicle.Vin))
       forceLoopResetEvent.Set();
   });
+// 1. Read current HVAC state from vehicle details
+  bool hvacIsActive = vehicle.Details.TryGetValue("remotePreconditioningStatus", out var hvacStatus)
+                    && hvacStatus?.ToUpperInvariant() == "ON";
 
+// 2. Create switch with fixed control logic (HA ON = car HVAC ON)
   var hvacSwitch = new HaSwitch(mqttClient, "HVAC", haDevice, async sw =>
   {
-    if (await TrySendCommand(fiatClient, sw.IsOn ? FiatCommand.ROPRECOND_OFF : FiatCommand.ROPRECOND, vehicle.Vin))
+    if (await TrySendCommand(fiatClient, sw.IsOn ? FiatCommand.ROPRECOND : FiatCommand.ROPRECOND_OFF, vehicle.Vin))
       forceLoopResetEvent.Set();
   });
+
+// 3. Set switch state to match vehicle
+  hvacSwitch.SwitchTo(hvacIsActive);
+
 
   var doorLock = new HaLock(mqttClient, "DoorLock", haDevice, async lockEntity =>
   {
