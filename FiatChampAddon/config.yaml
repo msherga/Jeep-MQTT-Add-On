@@ -6,7 +6,7 @@ services:
 version: "CUSTOM"
 homeassistant_api: true
 #image: "ghcr.io/wubbl0rz/image-{arch}-fiat-champ"
-slug: "Jeep_MQTT"
+slug: "jeep_mqtt"
 init: false
 discovery: 
     - "mqtt"
