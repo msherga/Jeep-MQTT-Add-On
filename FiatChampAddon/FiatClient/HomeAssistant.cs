@@ -342,6 +342,63 @@ public class HaSwitch : HaEntity
   }
 }
 
+public class HaLock : HaEntity
+{
+  private readonly string _commandTopic;
+  private readonly string _stateTopic;
+  private readonly string _configTopic;
+
+  public bool IsLocked { get; private set; }
+
+  public void SetLockState(bool locked)
+  {
+    IsLocked = locked;
+    _ = this.PublishState();
+  }
+
+  public HaLock(SimpleMqttClient mqttClient, string name, HaDevice haDevice, Func<HaLock, Task> onCommand)
+    : base(mqttClient, name, haDevice)
+  {
+    _commandTopic = $"homeassistant/lock/{_id}/set";
+    _stateTopic = $"homeassistant/lock/{_id}/state";
+    _configTopic = $"homeassistant/lock/{_id}/config";
+
+    _ = mqttClient.Sub(_commandTopic, async message =>
+    {
+      SetLockState(message == "LOCK");
+      await Task.Delay(100);
+      await onCommand.Invoke(this);
+    });
+  }
+
+  public override async Task PublishState()
+  {
+    var state = IsLocked ? "LOCKED" : "UNLOCKED";
+    await _mqttClient.Pub(_stateTopic, state);
+  }
+
+  public override async Task Announce()
+  {
+    await _mqttClient.Pub(_configTopic, $$"""
+    {
+      "device": {
+        "identifiers": ["{{ _haDevice.Identifier }}"],
+        "manufacturer": "{{ _haDevice.Manufacturer }}",
+        "model": "{{ _haDevice.Model }}",
+        "name": "{{ _haDevice.Name }}",
+        "sw_version": "{{ _haDevice.Version }}"
+      },
+      "name": "{{ _name }}",
+      "state_topic": "{{ _stateTopic }}",
+      "command_topic": "{{ _commandTopic }}",
+      "unique_id": "{{ _id }}",
+      "platform": "mqtt"
+    }
+    """);
+  }
+}
+
+
 public class HaDevice
 {
   public string Name { get; set;  }
