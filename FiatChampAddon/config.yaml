@@ -1,12 +1,12 @@
-name: "FiatChamp"
-url: "https://github.com/wubbl0rz/FiatChamp"
-description: "Connect your FIAT (uconnect) car to Home Assistant. 🚗"
+name: "Jeep MQTT"
+url: "https://github.com/msherga/Jeep-MQTT-Add-On"
+description: "Connect your Uconnect car to Home Assistant. 🚗"
 services:
     - "mqtt:want"
-version: "3.0.8"
+version: "CUSTOM"
 homeassistant_api: true
 image: "ghcr.io/wubbl0rz/image-{arch}-fiat-champ"
-slug: "fiat_champ"
+slug: "Jeep_MQTT"
 init: false
 discovery: 
     - "mqtt"
@@ -14,14 +14,14 @@ options:
   FiatUser: ""
   FiatPw: ""
   FiatPin: ""
-  Brand: "Fiat"
+  Brand: "Jeep"
   RefreshInterval: 15
   ConvertKmToMiles: false
   Debug: false
   AutoRefreshBattery: false
   AutoRefreshLocation: false
   EnableDangerousCommands: false
-  CarUnknownLocation: "away"
+  CarUnknownLocation: "unknown"
   StartDelaySeconds: 1
 schema:
   FiatUser: str
